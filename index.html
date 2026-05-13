@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SendPilot — Envio em Lote</title>
+    <meta name="description" content="Envio de e-mails em lote para pais de alunos de forma simples e eficiente.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <!-- Setup Screen (Overlay) -->
+    <div id="setup-screen" class="setup-overlay hidden">
+        <div class="setup-container">
+            <div class="setup-card">
+                <div class="setup-header">
+                    <div class="setup-logo">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </div>
+                    <h2>Configuração Inicial</h2>
+                    <p>Configure sua conta Google para começar a enviar e-mails.</p>
+                </div>
+
+                <div class="setup-body">
+                    <div class="form-group">
+                        <label>E-mail do Atendimento</label>
+                        <input type="email" id="setup-email" placeholder="ex: informatica.adm@externato.com.br">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha de App (16 dígitos)</label>
+                        <input type="password" id="setup-pass" placeholder="xxxx xxxx xxxx xxxx">
+                    </div>
+                    <div class="form-group">
+                        <label>Nome do Remetente</label>
+                        <input type="text" id="setup-name" value="Externato Santo Antonio">
+                    </div>
+                    
+                    <button id="btn-save-config" class="btn-primary-setup">
+                        Salvar e Continuar <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div class="setup-guide-link">
+                    <a href="#how-to-guide">Precisa de ajuda para gerar a Senha de App? Veja o guia abaixo ↓</a>
+                </div>
+            </div>
+
+            <!-- Detailed Guide -->
+            <div id="how-to-guide" class="setup-guide">
+                <h3><i class="fa-solid fa-key"></i> Como gerar sua Senha de App</h3>
+                
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <div class="guide-step__number">1</div>
+                        <div class="guide-step__content">
+                            <h4>Acesse sua Conta Google</h4>
+                            <p>Vá em <a href="https://myaccount.google.com/security" target="_blank">Segurança da Conta</a>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="guide-step">
+                        <div class="guide-step__number">2</div>
+                        <div class="guide-step__content">
+                            <h4>Verificação em 2 Etapas</h4>
+                            <p>Certifique-se que a <strong>Verificação em duas etapas</strong> esteja ATIVA.</p>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step__number">3</div>
+                        <div class="guide-step__content">
+                            <h4>Gerar Senha</h4>
+                            <p>Pesquise por "Senhas de app", escolha um nome (ex: SendPilot) e clique em <strong>Criar</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step__number">4</div>
+                        <div class="guide-step__content">
+                            <h4>Copie o Código</h4>
+                            <p>Copie o código de 16 letras gerado e cole no campo acima.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Navigation -->
+    <nav class="topnav">
+        <div class="topnav__brand">
+            <div class="topnav__icon">
+                <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <span class="topnav__name">SendPilot</span>
+        </div>
+        <div class="topnav__badge">
+            <i class="fa-regular fa-circle-dot"></i>
+            Atendimento
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="layout">
+
+        <!-- LEFT COLUMN -->
+        <aside class="sidebar">
+
+            <!-- Upload Card -->
+            <div class="card" id="upload-card">
+                <div class="card__label">
+                    <i class="fa-solid fa-file-excel"></i>
+                    Contatos
+                </div>
+
+                <div class="upload-zone" id="drop-zone">
+                    <input type="file" id="file-input" accept=".xlsx,.xls" hidden>
+                    <div class="upload-zone__content">
+                        <div class="upload-zone__icon">
+                            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                        </div>
+                        <p class="upload-zone__title">Arraste sua planilha aqui</p>
+                        <p class="upload-zone__sub">ou <span class="link">clique para buscar</span></p>
+                        <p class="upload-zone__hint">.xlsx · .xls</p>
+                    </div>
+                </div>
+
+                <div class="file-pill hidden" id="file-info">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span id="file-name">planilha.xlsx</span>
+                    <button id="remove-file" class="file-pill__remove" title="Remover">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Card -->
+            <div class="card card--stats">
+                <div class="stat">
+                    <span class="stat__value" id="total-contacts">0</span>
+                    <span class="stat__label">Destinatários</span>
+                </div>
+                <div class="stat">
+                    <span class="stat__value stat__value--success" id="count-success">0</span>
+                    <span class="stat__label">Enviados</span>
+                </div>
+                <div class="stat">
+                    <span class="stat__value stat__value--error" id="count-error">0</span>
+                    <span class="stat__label">Erros</span>
+                </div>
+            </div>
+
+            <!-- Send Button -->
+            <div class="send-panel">
+                <div class="progress-wrap hidden" id="progress-container">
+                    <div class="progress-meta">
+                        <span id="progress-text">Aguardando...</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="progress-fill"></div>
+                    </div>
+                </div>
+                <button class="btn-send" id="btn-send" disabled>
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Enviar E-mails
+                </button>
+                <p class="send-hint" id="send-hint">Carregue uma planilha e preencha a mensagem para continuar.</p>
+            </div>
+
+        </aside>
+
+        <!-- RIGHT COLUMN -->
+        <main class="main">
+
+            <!-- Compose Area -->
+            <div class="card compose">
+                <div class="compose__topbar">
+                    <div class="card__label">
+                        <i class="fa-solid fa-pen-nib"></i>
+                        Mensagem
+                    </div>
+                    <div class="compose__tabs">
+                        <button class="compose__tab compose__tab--active" id="tab-write" onclick="switchTab('write')">
+                            <i class="fa-solid fa-pen"></i> Escrever
+                        </button>
+                        <button class="compose__tab" id="tab-preview" onclick="switchTab('preview')">
+                            <i class="fa-regular fa-eye"></i> Pré-visualizar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Write Panel -->
+                <div id="panel-write">
+                    <input
+                        type="text"
+                        id="email-subject"
+                        class="compose__subject"
+                        placeholder="Assunto do e-mail…"
+                        autocomplete="off"
+                    >
+                    <textarea
+                        id="email-body"
+                        class="compose__body"
+                        placeholder="Escreva o comunicado aqui…&#10;&#10;Use {nome} para personalizar a mensagem com o nome de cada responsável."
+                    ></textarea>
+                </div>
+
+                <!-- Preview Panel -->
+                <div id="panel-preview" class="hidden">
+                    <div class="preview-label">Visualizando como: <span id="preview-recipient">Responsável</span></div>
+                    <iframe id="email-preview-frame" class="preview-frame" sandbox="allow-same-origin"></iframe>
+                </div>
+
+                <div class="compose__footer">
+                    <i class="fa-regular fa-lightbulb"></i>
+                    Use <code>{nome}</code> para personalizar automaticamente com o nome de cada responsável.
+                </div>
+            </div>
+
+            <!-- Recipients Table -->
+            <div class="card table-card">
+                <div class="card__header">
+                    <div class="card__label">
+                        <i class="fa-solid fa-users"></i>
+                        Destinatários
+                    </div>
+                    <span class="badge" id="badge-total">0 contatos</span>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="contacts-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contacts-body">
+                            <tr>
+                                <td colspan="3" class="table-empty">
+                                    <i class="fa-regular fa-folder-open"></i>
+                                    <span>Nenhuma planilha carregada</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

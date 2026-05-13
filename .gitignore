@@ -1,0 +1,22 @@
+# Dependências
+vendor/
+node_modules/
+
+# Configurações locais (senhas, etc)
+api/config.php
+.env
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de teste
+teste.txt
+api/teste_smtp.php
+
+# Planilhas de teste/exemplo
+assets/*.xlsx
+assets/*.xls
+
+# Logs e outros
+*.log
